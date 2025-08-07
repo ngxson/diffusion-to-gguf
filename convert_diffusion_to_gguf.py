@@ -19,7 +19,7 @@ import torch
 import gguf
 
 # TODO: add more:
-SUPPORTED_ARCHS = ["flux", "sd3", "ltxv", "hyvid", "wan", "hidream"]
+SUPPORTED_ARCHS = ["flux", "sd3", "ltxv", "hyvid", "wan", "hidream", "qwen"]
 
 logger = logging.getLogger(__name__)
 
@@ -271,9 +271,9 @@ def main() -> None:
 
     is_diffusers = False
     repo_id = None
+    merged_state_dict = None
     if args.model.is_dir():
         logging.info("Supplied a directory.")
-        merged_state_dict = None
         files = list(args.model.glob('*.safetensors'))
         n = len(files)
         if n == 0:
@@ -306,6 +306,10 @@ def main() -> None:
         logging.info(f"Serialized merged state dict to {filepath}")
         args.model = Path(filepath)
         is_diffusers = True
+
+        if merged_state_dict is not None:
+            os.remove(filepath)
+            logging.info(f"Removed the intermediate {filepath}.")
 
     if args.model.suffix != ".safetensors":
         logging.error(f"Model path {args.model} is not a safetensors file.")
