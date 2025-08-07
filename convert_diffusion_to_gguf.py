@@ -307,10 +307,6 @@ def main() -> None:
         args.model = Path(filepath)
         is_diffusers = True
 
-        if merged_state_dict is not None:
-            os.remove(filepath)
-            logging.info(f"Removed the intermediate {filepath}.")
-
     if args.model.suffix != ".safetensors":
         logging.error(f"Model path {args.model} is not a safetensors file.")
         sys.exit(1)
@@ -335,6 +331,9 @@ def main() -> None:
     )
     converter.write()
     logger.info(f"Conversion complete. Output written to {outfile}, architecture: {args.arch}, quantization: {qconfig.qtype.name}")
+    if merged_state_dict is not None:
+        os.remove(filepath)
+        logging.info(f"Removed the intermediate {filepath}.")
 
 if __name__ == "__main__":
     main()
